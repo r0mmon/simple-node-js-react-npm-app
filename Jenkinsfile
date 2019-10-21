@@ -1,16 +1,19 @@
 pipeline{
     agent{
-    kubernetes {
-      defaultContainer 'node'
-    }
+        kubernetes {
+            label 'node'
+            defaultContainer 'node'
+        }
     }
     options {
         skipStagesAfterUnstable()
     }
     stages{
         stage("Build"){
-            steps{
-                sh 'npm build'
+            steps {
+                container('maven') {
+                    sh 'npm build'
+                }
             }
             post{
                 always{
