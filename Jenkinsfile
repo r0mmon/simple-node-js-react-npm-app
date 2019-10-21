@@ -1,7 +1,8 @@
 pipeline{
     agent{
         kubernetes {
-            label 'node'
+            label 'jenkins-nodejs'
+            defaultContainer 'nodejs'
         }
     }
     options {
@@ -10,9 +11,7 @@ pipeline{
     stages{
         stage("Build"){
             steps {
-                container('node') {
-                    sh 'npm build'
-                }
+                sh 'npm build'
             }
             post{
                 always{
