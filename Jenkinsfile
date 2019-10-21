@@ -32,8 +32,8 @@ pipeline {
       }
     }
     stage("Package") {
-      container('docker') {
-        steps {
+      steps {
+        container('docker') {
           sh "docker ps"
         }
       }
