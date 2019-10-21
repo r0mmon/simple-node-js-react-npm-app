@@ -2,7 +2,6 @@ pipeline{
     agent{
         kubernetes {
             label 'node'
-            defaultContainer 'node'
         }
     }
     options {
@@ -11,7 +10,7 @@ pipeline{
     stages{
         stage("Build"){
             steps {
-                container('maven') {
+                container('node') {
                     sh 'npm build'
                 }
             }
