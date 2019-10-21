@@ -25,6 +25,17 @@ pipeline{
                 }
             }
         }
+        stage('Test') {
+          steps {
+            sh 'echo "Hello"'
+            sh 'npm test'
+          }
+        }
+        post {
+          always {
+            echo "Ok"
+          }
+        }
     }
     post{
         always{
