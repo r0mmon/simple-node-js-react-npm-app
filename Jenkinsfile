@@ -5,6 +5,9 @@ pipeline {
       defaultContainer 'nodejs'
     }
   }
+  environment {
+    CI = 'true'
+  }
   options {
     skipStagesAfterUnstable()
   }
@@ -25,10 +28,9 @@ pipeline {
         }
       }
     }
-    stage("Test") {
+    stage('Test') {
       steps {
-        sh 'echo "Hello"'
-        sh 'npm test'
+        sh './jenkins/scripts/test.sh'
       }
     }
     stage("Package") {
