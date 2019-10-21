@@ -1,7 +1,7 @@
 pipeline{
     agent{
         kubernetes {
-            image 'node:6-alpine'
+            name 'nodejs'
             args '-p 3000:3000'
         }
     }
