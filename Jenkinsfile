@@ -2,6 +2,7 @@ pipeline {
   agent {
     kubernetes {
       label 'jenkins-nodejs'
+      label 'jenkins-docker'
       defaultContainer 'nodejs'
     }
   }
