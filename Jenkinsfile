@@ -1,8 +1,8 @@
 pipeline {
   agent {
     kubernetes {
-      label 'jenkins-nodejs'
-      defaultContainer 'nodejs'
+      label 'build-service-pod'
+      defaultContainer 'jnlp'
       yaml """
 apiVersion: v1
 kind: Pod
@@ -11,6 +11,13 @@ metadata:
     job: build-service
 spec:
   containers:
+  - name: nodejs
+    image: node
+    command: ["cat"]
+    tty: true
+    volumeMounts:
+    - name: repository
+      mountPath: /root/.m2/repository
   - name: docker
     image: docker:18.09.2
     command: ["cat"]
@@ -19,6 +26,9 @@ spec:
     - name: docker-sock
       mountPath: /var/run/docker.sock
   volumes:
+  - name: repository
+    persistentVolumeClaim:
+      claimName: repository
   - name: docker-sock
     hostPath:
       path: /var/run/docker.sock
@@ -54,14 +64,13 @@ spec:
       }
     }
     stage("Package") {
-      agent {
-        kubernetes {
-          label 'jenkins-docker'
-        }
-      }
       steps {
+        container('nodejs') {
+          sh "npm run-script build"
+        }
         container('docker') {
           sh "docker ps"
+          sh "ls -l"
         }
       }
     }
