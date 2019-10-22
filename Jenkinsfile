@@ -3,6 +3,26 @@ pipeline {
     kubernetes {
       label 'jenkins-nodejs'
       defaultContainer 'nodejs'
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    job: build-service
+spec:
+  containers:
+  - name: docker
+    image: docker:18.09.2
+    command: ["cat"]
+    tty: true
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+"""
     }
   }
   environment {
