@@ -1,9 +1,9 @@
 pipeline {
   agent {
     kubernetes {
-      label 'build-service-pod'
-      defaultContainer 'nodejs'
-      yaml """
+        label 'build-service-pod'
+        defaultContainer 'nodejs'
+        yaml """
 apiVersion: v1
 kind: Pod
 metadata:
@@ -27,53 +27,50 @@ spec:
     hostPath:
       path: /var/run/docker.sock
 """
-    }
-  }
-  environment {
-    CI = 'true'
-  }
-  options {
-    skipStagesAfterUnstable()
-  }
-  stages {
-    stage("Build"){
-      steps {
-        sh 'npm install'
-      }
-      post {
-        always{
-          echo "========always========"
         }
-        success{
-          echo "========A executed successfully========"
-        }
-        failure{
-          echo "========A execution failed========"
-        }
-      }
     }
-    stage('Test') {
-      steps {
-        sh './jenkins/scripts/test.sh'
-      }
+    environment {
+        CI = 'true'
     }
-    stage("Package") {
-      steps {
-        container('nodejs') {
-          sh "npm run-script build"
+    options {
+        skipStagesAfterUnstable()
+    }
+    stages {
+        stage("Build") {
+            steps {
+                sh 'npm install'
+            }
+            post {
+                always{
+                    echo "========always========"
+                }
+                success{
+                    echo "========A executed successfully========"
+                }
+                failure{
+                    echo "========A execution failed========"
+                }
+            }
         }
-        container('docker') {
-          sh "docker ps"
-          sh "ls -l"
+        stage('Test') {
+            steps {
+                sh './jenkins/scripts/test.sh'
+            }
         }
-      }
+
+        stage('Deliver') {
+            steps {
+                container('nodejs') {
+                    sh './jenkins/scripts/deliver.sh'
+                    input message: 'Finished using the web site? (Click "Proceed" to continue)'
+                    sh './jenkins/scripts/kill.sh'
+                }
+                
+                container('docker') {
+                    sh "docker ps"
+                    sh "ls -l"
+                }
+            }
+        }
     }
-    stage('Deliver') {
-      steps {
-        sh './jenkins/scripts/deliver.sh'
-        input message: 'Finished using the web site? (Click "Proceed" to continue)'
-        sh './jenkins/scripts/kill.sh'
-      }
-    }
-  }
 }
